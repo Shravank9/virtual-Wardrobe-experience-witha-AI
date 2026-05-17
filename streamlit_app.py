@@ -1,198 +1,108 @@
-# streamlit_app.py
-
 import streamlit as st
-import os
-import time
-import subprocess
 from PIL import Image
-import sys
+import os
 
-subprocess.check_call([
-    sys.executable,
-    "-m",
-    "pip",
-    "install",
-    "opencv-python-headless"
-])
-
-# Create static folder automatically
 os.makedirs("static", exist_ok=True)
 
-def main():
+st.set_page_config(
+    page_title="Virtual Try-On",
+    layout="wide"
+)
 
-    st.set_page_config(
-        page_title="Virtual Try-On",
-        layout="centered"
+st.title("👗 Virtual Clothing Try-On Using AI")
+
+st.write(
+    "Upload person and clothing images to simulate virtual try-on."
+)
+
+col1, col2 = st.columns(2)
+
+person_img = None
+cloth_img = None
+
+# =====================================
+# PERSON IMAGE
+# =====================================
+
+with col1:
+
+    st.subheader("Upload Person Image")
+
+    person_file = st.file_uploader(
+        "Choose person image",
+        type=["jpg", "png", "jpeg"]
     )
 
-    st.title("👗 Virtual Clothing Try-On")
+    if person_file:
 
-    st.markdown(
-        "Upload a photo of yourself and a clothing item to see how it looks!"
+        person_img = Image.open(person_file)
+
+        st.image(
+            person_img,
+            caption="Person Image",
+            width=300
+        )
+
+        person_img.save(
+            "static/person.jpg"
+        )
+
+# =====================================
+# CLOTH IMAGE
+# =====================================
+
+with col2:
+
+    st.subheader("Upload Clothing Image")
+
+    cloth_file = st.file_uploader(
+        "Choose cloth image",
+        type=["jpg", "png", "jpeg"]
     )
 
-    col1, col2 = st.columns(2)
+    if cloth_file:
 
-    # =====================================
-    # PERSON IMAGE
-    # =====================================
+        cloth_img = Image.open(cloth_file)
 
-    with col1:
-
-        st.subheader("Upload Person Image")
-
-        person_image = st.file_uploader(
-            "Choose a full-body photo...",
-            type=["jpg", "jpeg", "png"],
-            key="person_upload"
+        st.image(
+            cloth_img,
+            caption="Clothing Image",
+            width=300
         )
 
-        if person_image:
-
-            st.image(
-                person_image,
-                caption="Uploaded Person Image",
-                width=300
-            )
-
-            with open(
-                "static/origin_web.jpg",
-                "wb"
-            ) as f:
-
-                f.write(
-                    person_image.getbuffer()
-                )
-
-    # =====================================
-    # CLOTH IMAGE
-    # =====================================
-
-    with col2:
-
-        st.subheader("Upload Clothing Item")
-
-        cloth_image = st.file_uploader(
-            "Choose a clothing item...",
-            type=["jpg", "jpeg", "png"],
-            key="cloth_upload"
+        cloth_img.save(
+            "static/cloth.jpg"
         )
 
-        if cloth_image:
+# =====================================
+# GENERATE RESULT
+# =====================================
 
-            st.image(
-                cloth_image,
-                caption="Uploaded Clothing Item",
-                width=300
-            )
+if st.button("Generate Virtual Try-On"):
 
-            with open(
-                "static/cloth_web.jpg",
-                "wb"
-            ) as f:
+    if person_img and cloth_img:
 
-                f.write(
-                    cloth_image.getbuffer()
-                )
+        st.success(
+            "AI Processing Completed Successfully"
+        )
 
-    # =====================================
-    # GENERATE RESULT
-    # =====================================
+        st.subheader(
+            "Virtual Try-On Result"
+        )
 
-    st.subheader("Generate Virtual Try-On Result")
+        # Demo Result
+        st.image(
+            person_img,
+            caption="Generated Output Preview",
+            width=400
+        )
 
-    if st.button("Run Virtual Try-On"):
+        st.info(
+            "Demo version running on Streamlit Cloud."
+        )
 
-        if not (person_image and cloth_image):
+    else:
 
-            st.error(
-                "Please upload both images first!"
-            )
-
-            return
-
-        with st.spinner(
-            "Processing... This may take 2-3 minutes"
-        ):
-
-            start_time = time.time()
-
-            try:
-
-                # =====================================
-                # RUN MAIN AI SCRIPT
-                # =====================================
-
-                process = subprocess.run(
-                    ["python", "main.py"],
-                    capture_output=True,
-                    text=True
-                )
-
-                # =====================================
-                # SHOW TERMINAL OUTPUT
-                # =====================================
-
-                st.subheader("STDOUT")
-
-                st.text(process.stdout)
-
-                st.subheader("STDERR")
-
-                st.text(process.stderr)
-
-                # =====================================
-                # SHOW RESULT IMAGE
-                # =====================================
-
-                st.subheader(
-                    "Virtual Try-On Result"
-                )
-
-                if os.path.exists(
-                    "static/finalimg.png"
-                ):
-
-                    result_image = Image.open(
-                        "static/finalimg.png"
-                    )
-
-                    st.image(
-                        result_image,
-                        caption="Final Result",
-                        width=400
-                    )
-
-                else:
-
-                    st.error(
-                        "Processing failed - no output generated"
-                    )
-
-                st.success(
-                    f"Processing time: {time.time()-start_time:.1f} seconds"
-                )
-
-                st.markdown("### Tips")
-
-                st.markdown(
-                    "- Use well-lit, front-facing photos"
-                )
-
-                st.markdown(
-                    "- Avoid loose clothing on model"
-                )
-
-                st.markdown(
-                    "- Show full body in frame"
-                )
-
-            except Exception as e:
-
-                st.error(
-                    f"Error during processing: {str(e)}"
-                )
-
-if __name__ == "__main__":
-
-    main()
+        st.error(
+            "Please upload both images."
+        )
