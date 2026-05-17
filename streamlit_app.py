@@ -5,6 +5,15 @@ import os
 import time
 import subprocess
 from PIL import Image
+import sys
+
+subprocess.check_call([
+    sys.executable,
+    "-m",
+    "pip",
+    "install",
+    "opencv-python-headless"
+])
 
 # Create static folder automatically
 os.makedirs("static", exist_ok=True)
