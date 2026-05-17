@@ -2,6 +2,7 @@ import streamlit as st
 from PIL import Image
 import os
 
+# Create static folder
 os.makedirs("static", exist_ok=True)
 
 st.set_page_config(
@@ -30,13 +31,15 @@ with col1:
 
     person_file = st.file_uploader(
         "Choose person image",
-        type=["jpg", "png", "jpeg"],
+        type=["jpg", "jpeg", "png"],
         key="person"
     )
 
     if person_file:
 
-        person_img = Image.open(person_file).convert("RGBA")
+        person_img = Image.open(
+            person_file
+        ).convert("RGBA")
 
         st.image(
             person_img,
@@ -53,14 +56,16 @@ with col2:
     st.subheader("Upload Clothing Image")
 
     cloth_file = st.file_uploader(
-        "Choose cloth image",
-        type=["jpg", "png", "jpeg"],
+        "Choose clothing image",
+        type=["jpg", "jpeg", "png"],
         key="cloth"
     )
 
     if cloth_file:
 
-        cloth_img = Image.open(cloth_file).convert("RGBA")
+        cloth_img = Image.open(
+            cloth_file
+        ).convert("RGBA")
 
         st.image(
             cloth_img,
@@ -86,16 +91,47 @@ if st.button("Generate Virtual Try-On"):
             (180, 220)
         )
 
-        # Overlay cloth onto person
+        # =====================================
+        # REMOVE WHITE BACKGROUND
+        # =====================================
+
+        cloth_data = cloth_img.getdata()
+
+        new_data = []
+
+        for item in cloth_data:
+
+            # Remove white pixels
+            if (
+                item[0] > 220 and
+                item[1] > 220 and
+                item[2] > 220
+            ):
+
+                new_data.append(
+                    (255, 255, 255, 0)
+                )
+
+            else:
+
+                new_data.append(item)
+
+        cloth_img.putdata(new_data)
+
+        # =====================================
+        # CREATE RESULT
+        # =====================================
+
         result = person_img.copy()
 
+        # Paste cloth on body
         result.paste(
             cloth_img,
-            (110, 170),
+            (110, 140),
             cloth_img
         )
 
-        # Save result
+        # Save output
         result.save(
             "static/final_output.png"
         )
