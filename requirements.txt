@@ -1,4 +1,5 @@
 streamlit
+gradio
 pillow
 numpy
 opencv-python-headless
