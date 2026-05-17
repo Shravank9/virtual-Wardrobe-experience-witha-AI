@@ -5,7 +5,7 @@ import os
 import time
 from PIL import Image
 
-# Automatically create static folder
+# Create static folder automatically
 os.makedirs("static", exist_ok=True)
 
 def main():
@@ -109,14 +109,28 @@ def main():
 
             try:
 
-                # Run AI Processing Script
-                os.system("python main.py")
+                # =====================================
+                # RUN MAIN AI SCRIPT
+                # =====================================
+
+                result = os.popen(
+                    "python main.py"
+                ).read()
+
+                st.subheader(
+                    "Execution Logs"
+                )
+
+                st.text(result)
+
+                # =====================================
+                # SHOW RESULT IMAGE
+                # =====================================
 
                 st.subheader(
                     "Virtual Try-On Result"
                 )
 
-                # Display Result
                 if os.path.exists(
                     "static/finalimg.png"
                 ):
