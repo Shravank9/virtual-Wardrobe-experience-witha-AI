@@ -1,15 +1,3 @@
-import subprocess
-import sys
-
-# Install OpenCV if missing
-subprocess.check_call([
-    sys.executable,
-    "-m",
-    "pip",
-    "install",
-    "opencv-python-headless"
-])
-
 import cv2
 import os
 from PIL import Image
@@ -42,7 +30,8 @@ if __name__ == '__main__':
     if img is None:
 
         print("Input image not found")
-        sys.exit()
+
+        exit()
 
     ori_img = cv2.resize(
         img,
@@ -55,7 +44,7 @@ if __name__ == '__main__':
     )
 
     # =====================================
-    # RESIZE IMAGE
+    # RESIZE INPUT IMAGE
     # =====================================
 
     img = cv2.imread('origin.jpg')
@@ -120,7 +109,8 @@ if __name__ == '__main__':
     if mask_img is None:
 
         print("Segmentation image not generated")
-        sys.exit()
+
+        exit()
 
     mask_img = cv2.resize(
         mask_img,
@@ -223,7 +213,7 @@ if __name__ == '__main__':
 
         print("No output images generated")
 
-        sys.exit()
+        exit()
 
     # ADD BACKGROUND
     if opt.background:
