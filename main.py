@@ -1,3 +1,15 @@
+import subprocess
+import sys
+
+# Install pillow temporarily
+subprocess.check_call([
+    sys.executable,
+    "-m",
+    "pip",
+    "install",
+    "pillow"
+])
+
 import cv2
 import os
 from PIL import Image
