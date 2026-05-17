@@ -3,6 +3,7 @@
 import streamlit as st
 import os
 import time
+import subprocess
 from PIL import Image
 
 # Create static folder automatically
@@ -113,15 +114,23 @@ def main():
                 # RUN MAIN AI SCRIPT
                 # =====================================
 
-                result = os.popen(
-                    "python main.py"
-                ).read()
-
-                st.subheader(
-                    "Execution Logs"
+                process = subprocess.run(
+                    ["python", "main.py"],
+                    capture_output=True,
+                    text=True
                 )
 
-                st.text(result)
+                # =====================================
+                # SHOW TERMINAL OUTPUT
+                # =====================================
+
+                st.subheader("STDOUT")
+
+                st.text(process.stdout)
+
+                st.subheader("STDERR")
+
+                st.text(process.stderr)
 
                 # =====================================
                 # SHOW RESULT IMAGE
