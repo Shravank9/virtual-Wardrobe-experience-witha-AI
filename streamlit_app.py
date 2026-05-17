@@ -1,160 +1,68 @@
+# streamlit_app.py
 import streamlit as st
-from PIL import Image
 import os
+import time
+from PIL import Image
 
-# Create static folder
-os.makedirs("static", exist_ok=True)
+def main():
+    st.set_page_config(page_title="Virtual Try-On", layout="centered")
+    
+    st.title("👗 Virtual Clothing Try-On")
+    st.markdown("Upload a photo of yourself and a clothing item to see how it looks!")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("Upload Person Image")
+        person_image = st.file_uploader("Choose a full-body photo...", 
+                                      type=["jpg", "jpeg", "png"], 
+                                      key="person_upload")
+        
+        if person_image:
+            st.image(person_image, caption="Uploaded Person Image", width=300)
+            with open("static/origin_web.jpg", "wb") as f:
+                f.write(person_image.getbuffer())
+    
+    with col2:
+        st.subheader("Upload Clothing Item")
+        cloth_image = st.file_uploader("Choose a clothing item...", 
+                                     type=["jpg", "jpeg", "png"], 
+                                     key="cloth_upload")
+        
+        if cloth_image:
+            st.image(cloth_image, caption="Uploaded Clothing Item", width=300)
+            with open("static/cloth_web.jpg", "wb") as f:
+                f.write(cloth_image.getbuffer())
+    
+    st.subheader("Step 3: Generate Result")
+    if st.button("Run Virtual Try-On"):
+        if not (person_image and cloth_image):
+            st.error("Please upload both images first!")
+            return
+            
+        with st.spinner("Processing... This may take 2-3 minutes"):
+            start_time = time.time()
+            
+            try:
+                # Run the main processing script
+                os.system("python3 main.py")
+                
+                # Display result
+                st.subheader("Virtual Try-On Result")
+                if os.path.exists("static/finalimg.png"):
+                    result_image = Image.open("static/finalimg.png")
+                    st.image(result_image, caption="Final Result", width=400)
+                else:
+                    st.error("Processing failed - no output generated")
+                
+                st.success(f"Processing time: {time.time()-start_time:.1f} seconds")
+                st.markdown("### Tips:")
+                st.markdown("- Use well-lit, front-facing photos")
+                st.markdown("- Avoid loose clothing on model")
+                st.markdown("- Show full body in frame")
+                    
+            except Exception as e:
+                st.error(f"Error during processing: {str(e)}")
 
-st.set_page_config(
-    page_title="Virtual Try-On",
-    layout="wide"
-)
-
-st.title("👗 Virtual Clothing Try-On Using AI")
-
-st.write(
-    "Upload person and clothing images to simulate virtual try-on."
-)
-
-col1, col2 = st.columns(2)
-
-person_img = None
-cloth_img = None
-
-# =====================================
-# PERSON IMAGE
-# =====================================
-
-with col1:
-
-    st.subheader("Upload Person Image")
-
-    person_file = st.file_uploader(
-        "Choose person image",
-        type=["jpg", "jpeg", "png"],
-        key="person"
-    )
-
-    if person_file:
-
-        person_img = Image.open(
-            person_file
-        ).convert("RGBA")
-
-        st.image(
-            person_img,
-            caption="Person Image",
-            width=300
-        )
-
-# =====================================
-# CLOTH IMAGE
-# =====================================
-
-with col2:
-
-    st.subheader("Upload Clothing Image")
-
-    cloth_file = st.file_uploader(
-        "Choose clothing image",
-        type=["jpg", "jpeg", "png"],
-        key="cloth"
-    )
-
-    if cloth_file:
-
-        cloth_img = Image.open(
-            cloth_file
-        ).convert("RGBA")
-
-        st.image(
-            cloth_img,
-            caption="Clothing Image",
-            width=300
-        )
-
-# =====================================
-# GENERATE RESULT
-# =====================================
-
-if st.button("Generate Virtual Try-On"):
-
-    if person_img and cloth_img:
-
-        # Resize person image
-        person_img = person_img.resize(
-            (400, 600)
-        )
-
-        # Resize cloth image
-        cloth_img = cloth_img.resize(
-            (180, 220)
-        )
-
-        # =====================================
-        # REMOVE WHITE BACKGROUND
-        # =====================================
-
-        cloth_data = cloth_img.getdata()
-
-        new_data = []
-
-        for item in cloth_data:
-
-            # Remove white pixels
-            if (
-                item[0] > 220 and
-                item[1] > 220 and
-                item[2] > 220
-            ):
-
-                new_data.append(
-                    (255, 255, 255, 0)
-                )
-
-            else:
-
-                new_data.append(item)
-
-        cloth_img.putdata(new_data)
-
-        # =====================================
-        # CREATE RESULT
-        # =====================================
-
-        result = person_img.copy()
-
-        # Paste cloth on body
-        result.paste(
-            cloth_img,
-            (110, 140),
-            cloth_img
-        )
-
-        # Save output
-        result.save(
-            "static/final_output.png"
-        )
-
-        st.success(
-            "Virtual Try-On Generated Successfully"
-        )
-
-        st.subheader(
-            "Generated Result"
-        )
-
-        st.image(
-            result,
-            width=400
-        )
-
-        st.info(
-            "Demo AI virtual try-on simulation running on Streamlit Cloud."
-        )
-
-    else:
-
-        st.error(
-            "Please upload both images."
-        )
+if __name__ == "__main__":
+    main()
