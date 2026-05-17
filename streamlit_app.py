@@ -30,21 +30,18 @@ with col1:
 
     person_file = st.file_uploader(
         "Choose person image",
-        type=["jpg", "png", "jpeg"]
+        type=["jpg", "png", "jpeg"],
+        key="person"
     )
 
     if person_file:
 
-        person_img = Image.open(person_file)
+        person_img = Image.open(person_file).convert("RGBA")
 
         st.image(
             person_img,
             caption="Person Image",
             width=300
-        )
-
-        person_img.save(
-            "static/person.jpg"
         )
 
 # =====================================
@@ -57,21 +54,18 @@ with col2:
 
     cloth_file = st.file_uploader(
         "Choose cloth image",
-        type=["jpg", "png", "jpeg"]
+        type=["jpg", "png", "jpeg"],
+        key="cloth"
     )
 
     if cloth_file:
 
-        cloth_img = Image.open(cloth_file)
+        cloth_img = Image.open(cloth_file).convert("RGBA")
 
         st.image(
             cloth_img,
             caption="Clothing Image",
             width=300
-        )
-
-        cloth_img.save(
-            "static/cloth.jpg"
         )
 
 # =====================================
@@ -82,23 +76,45 @@ if st.button("Generate Virtual Try-On"):
 
     if person_img and cloth_img:
 
+        # Resize person image
+        person_img = person_img.resize(
+            (400, 600)
+        )
+
+        # Resize cloth image
+        cloth_img = cloth_img.resize(
+            (180, 220)
+        )
+
+        # Overlay cloth onto person
+        result = person_img.copy()
+
+        result.paste(
+            cloth_img,
+            (110, 170),
+            cloth_img
+        )
+
+        # Save result
+        result.save(
+            "static/final_output.png"
+        )
+
         st.success(
-            "AI Processing Completed Successfully"
+            "Virtual Try-On Generated Successfully"
         )
 
         st.subheader(
-            "Virtual Try-On Result"
+            "Generated Result"
         )
 
-        # Demo Result
         st.image(
-            person_img,
-            caption="Generated Output Preview",
+            result,
             width=400
         )
 
         st.info(
-            "Demo version running on Streamlit Cloud."
+            "Demo AI virtual try-on simulation running on Streamlit Cloud."
         )
 
     else:
