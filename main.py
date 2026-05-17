@@ -1,13 +1,15 @@
 import subprocess
 import sys
 
-# Install pillow temporarily
+# Install required packages
 subprocess.check_call([
     sys.executable,
     "-m",
     "pip",
     "install",
-    "pillow"
+    "opencv-python-headless",
+    "pillow",
+    "numpy"
 ])
 
 import cv2
