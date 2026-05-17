@@ -20,7 +20,7 @@ import glob
 import warnings
 import argparse
 
-from cloths_segmentation.pre_trained_models import create_model
+
 
 if __name__ == '__main__':
 
