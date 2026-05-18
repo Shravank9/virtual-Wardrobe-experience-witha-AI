@@ -15,10 +15,6 @@ You can simply try it using colab
 > **docker tag** \
 > pt112-tf29-jax0314-py39-20220803
 
-## Installation
-~~see [INSTALL.md](./INSTALL.md) for the installation~~
-we will add INSTALL.md soon.
-
 ## References
 #### HR-VITON
 https://github.com/sangyun884/HR-VITON
